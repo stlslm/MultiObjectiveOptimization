@@ -41,16 +41,16 @@ class MinNormSolver:
                 if (i,j) not in dps:
                     dps[(i, j)] = 0.0
                     for k in range(len(vecs[i])):
-                        dps[(i,j)] += torch.dot(vecs[i][k], vecs[j][k]).data[0]
+                        dps[(i,j)] += torch.dot(vecs[i][k], vecs[j][k]).data
                     dps[(j, i)] = dps[(i, j)]
                 if (i,i) not in dps:
                     dps[(i, i)] = 0.0
                     for k in range(len(vecs[i])):
-                        dps[(i,i)] += torch.dot(vecs[i][k], vecs[i][k]).data[0]
+                        dps[(i,i)] += torch.dot(vecs[i][k], vecs[i][k]).data
                 if (j,j) not in dps:
                     dps[(j, j)] = 0.0   
                     for k in range(len(vecs[i])):
-                        dps[(j, j)] += torch.dot(vecs[j][k], vecs[j][k]).data[0]
+                        dps[(j, j)] += torch.dot(vecs[j][k], vecs[j][k]).data
                 c,d = MinNormSolver._min_norm_element_from2(dps[(i,i)], dps[(i,j)], dps[(j,j)])
                 if d < dmin:
                     dmin = d
@@ -130,6 +130,8 @@ class MinNormSolver:
                     v1v2 += sol_vec[i]*new_point[j]*dps[(i,j)]
                     v2v2 += new_point[i]*new_point[j]*dps[(i,j)]
             nc, nd = MinNormSolver._min_norm_element_from2(v1v1, v1v2, v2v2)
+            if not isinstance(nc, float):
+                nc = nc.cpu().numpy()
             new_sol_vec = nc*sol_vec + (1-nc)*new_point
             change = new_sol_vec - sol_vec
             if np.sum(np.abs(change)) < MinNormSolver.STOP_CRIT:
